@@ -23,20 +23,18 @@
         android:layout_below="@+id/input_city"
         android:layout_centerHorizontal="true" />
 
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/game_leave"
-        android:id="@+id/gameLeave"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
-
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/textView4"
-        android:layout_below="@+id/gameLeave"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="40dp" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Pass"
+        android:id="@+id/pass"
+        android:layout_below="@+id/go"
+        android:layout_centerHorizontal="true" />
 </RelativeLayout>

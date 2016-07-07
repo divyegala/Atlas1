@@ -23,7 +23,7 @@ public class JoinGame extends AppCompatActivity {
     Pubnub pubnub;
     int check=0;
 
-    private static String url = "http://192.168.1.7/android_connect/joinsession.php";
+    private static String url = "http://192.168.0.106/android_connect/joinsession.php";
     private static final String TAG_PASSWORD="password";
     private static final String TAG_SUCCESS="success";
     String password,username;

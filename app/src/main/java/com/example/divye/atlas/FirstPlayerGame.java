@@ -35,11 +35,14 @@ public class FirstPlayerGame extends AppCompatActivity {
     //int allID = new int[100];
     static HashMap<Integer,String> allName = new HashMap<Integer,String>();
     static HashMap<Integer,String> chanceDecider = new HashMap<>();
+    static HashMap<String,Integer> score= new HashMap<>();
+    static Integer points=0;
     //ArrayList<String> a=new ArrayList<>();
     JSONParser jParser = new JSONParser();
     Button go;
+    Button pass;
 
-    private static String url = "http://192.168.1.7/android_connect/getname.php";
+    private static String url = "http://192.168.0.101/android_connect/getname.php";
     Pubnub pubnub;
     String name;
     private static final String TAG_SUCCESS = "success";
@@ -48,9 +51,10 @@ public class FirstPlayerGame extends AppCompatActivity {
     private static final String TAG = "NewGame";
     private String password,list;
     static int chanceNo=1;
+    static String content;
     static Integer count = 0,kkk = 1;
     static int key=1,turn = 0;
-    static String username,receivedName,totalList;
+    static String username,receivedName,totalList,currentUser,currentChance,passChance="pass";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -61,6 +65,7 @@ public class FirstPlayerGame extends AppCompatActivity {
             StrictMode.setThreadPolicy(policy);
         }
         go = (Button) findViewById(R.id.go);
+        pass = (Button) findViewById(R.id.pass);
         Bundle extras=getIntent().getExtras();
         int status=extras.getInt("status");
         if(turn == 0 || status == 0 )
@@ -126,7 +131,8 @@ public class FirstPlayerGame extends AppCompatActivity {
                                 runOnUiThread(new Runnable() {
                                     @Override
                                     public void run() {
-                                        String currentUser="",currentChance="";
+                                        currentUser="";
+                                        currentChance="";
                                         for (int i = 0; i < receivedName.length(); i++) {
                                             while (receivedName.charAt(i) != ',') {
                                                 currentUser = currentUser + receivedName.charAt(i++);
@@ -135,14 +141,52 @@ public class FirstPlayerGame extends AppCompatActivity {
                                             currentChance = currentChance + receivedName.charAt(i++);
                                             chanceNo = Integer.parseInt(currentChance);
                                         }
-                                        textView.setText(currentUser);
-                                        allName.put(count,currentUser);
-                                        count++;
-                                        if(chanceDecider.get(chanceNo).equals(username)){
-                                            go.setEnabled(true);
+                                        Toast.makeText(getApplicationContext(),currentUser,Toast.LENGTH_SHORT).show();
+                                        if(!currentUser.equals(passChance)) {
+                                            Toast.makeText(getApplicationContext(),chanceDecider.get(chanceNo)+","+username,Toast.LENGTH_SHORT).show();
+                                            textView.setText(currentUser);
+                                            allName.put(count, currentUser);
+                                            count++;
+                                            if (chanceDecider.get(chanceNo).equals(username)) {
+                                                go.setEnabled(true);
+                                            } else
+                                                go.setEnabled(false);
                                         }
-                                        else
-                                            go.setEnabled(false);
+                                        else{
+                                            Toast.makeText(getApplicationContext(),"Else",Toast.LENGTH_SHORT).show();
+                                            if(!content.isEmpty() && content!=null) {
+                                                Toast.makeText(getApplicationContext(),"Else If",Toast.LENGTH_SHORT).show();
+                                                for (int i = 0; i < receivedName.length(); i++) {
+                                                    while (receivedName.charAt(i) != ',') {
+                                                        // currentUser = currentUser + receivedName.charAt(i++);
+                                                    }
+                                                    i++;
+                                                    while (receivedName.charAt(i) != ',') {
+                                                        currentUser = currentUser + receivedName.charAt(i++);
+                                                    }
+                                                    i++;
+                                                    currentChance = currentChance + receivedName.charAt(i++);
+                                                    chanceNo = Integer.parseInt(currentChance);
+                                                }
+                                                textView.setText(currentUser);
+                                                allName.put(count, currentUser);
+                                                count++;
+                                                if (chanceDecider.get(chanceNo).equals(username)) {
+                                                    go.setEnabled(true);
+                                                } else
+                                                    go.setEnabled(false);
+                                            }
+                                            else{
+                                                Toast.makeText(getApplicationContext(),"HERE",Toast.LENGTH_SHORT).show();
+                                                allName.put(count, currentUser);
+                                                count++;
+                                                if (chanceDecider.get(chanceNo).equals(username)) {
+                                                    go.setEnabled(true);
+                                                } else
+                                                    go.setEnabled(false);
+                                            }
+
+                                        }
                                     }
                                 });
 
@@ -171,13 +215,25 @@ public class FirstPlayerGame extends AppCompatActivity {
         System.out.println(chanceDecider.get(chanceNo));
         System.out.println(username);
 
-        Button gameL = (Button) findViewById(R.id.gameLeave);
-
-
-        gameL.setOnClickListener(new View.OnClickListener() {
+        pass.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //db.delete("city",null,null);
+                content=textView.getText().toString();
+                chanceNo++;
+                if(chanceNo>chanceDecider.size()){
+                    chanceNo=1;
+                }
+                points--;
+                score.put(username,points);
+                if(content.isEmpty() || content==null){
+
+                    pubnub.publish(password,"pass,"+chanceNo, new Callback() {
+                    });
+                }
+                else {
+                    pubnub.publish(password, "pass," + currentUser + "," + chanceNo, new Callback() {
+                    });
+                }
             }
         });
 

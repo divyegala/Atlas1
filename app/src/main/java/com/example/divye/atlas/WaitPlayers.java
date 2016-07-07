@@ -68,8 +68,8 @@ public class WaitPlayers extends AppCompatActivity {
 
                                     a.add(key, messages);
                                     key++;
-                                    messages = "";
                                     textView.append("\n"+messages);
+                                    messages = "";
                                 }
                             });
 

@@ -22,7 +22,7 @@ public class Players extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.players);
+        setContentView(R.layout.activity_join_game);
         if (android.os.Build.VERSION.SDK_INT > 9) {
             StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder()
                     .permitAll().build();
@@ -31,14 +31,17 @@ public class Players extends AppCompatActivity {
 
         final Intent in = getIntent();
 
-        Button submit=(Button)findViewById(R.id.submit);
-        final EditText ed=(EditText)findViewById(R.id.rec_pass);
-        final EditText use = (EditText)findViewById(R.id.editText);
+        Button submit=(Button)findViewById(R.id.join);
+        submit.setText("SUBMIT");
+
+        final EditText use = (EditText)findViewById(R.id.user);
+        final EditText ed=(EditText)findViewById(R.id.edit_pass);
         submit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                password=ed.getText().toString();
+
                 username=use.getText().toString();
+                password=ed.getText().toString();
 
                 Intent intent = new Intent(getApplicationContext(),WaitPlayers.class);
                 intent.putExtra("password",password);
