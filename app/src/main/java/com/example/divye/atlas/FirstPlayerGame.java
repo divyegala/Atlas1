@@ -41,8 +41,10 @@ public class FirstPlayerGame extends AppCompatActivity {
     JSONParser jParser = new JSONParser();
     Button go;
     Button pass;
+    EditText in1;
+    GetCity getcitymethod = null;
 
-    private static String url = "http://192.168.0.101/android_connect/getname.php";
+    private static String url = "http://192.168.0.107/android_connect/getname.php";
     Pubnub pubnub;
     String name;
     private static final String TAG_SUCCESS = "success";
@@ -54,7 +56,9 @@ public class FirstPlayerGame extends AppCompatActivity {
     static String content;
     static Integer count = 0,kkk = 1;
     static int key=1,turn = 0;
-    static String username,receivedName,totalList,currentUser,currentChance,passChance="pass";
+    Integer person;
+    static String username,receivedName,totalList,currentCity="",currentChance,passChance="pass";
+    static StringBuffer curCity = new StringBuffer("");
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -68,10 +72,16 @@ public class FirstPlayerGame extends AppCompatActivity {
         pass = (Button) findViewById(R.id.pass);
         Bundle extras=getIntent().getExtras();
         int status=extras.getInt("status");
-        if(turn == 0 || status == 0 )
+        person=extras.getInt("person");
+        Toast.makeText(getApplicationContext(),person.toString(),Toast.LENGTH_SHORT).show();
+        if(person == 0 || status == 0) {
             go.setEnabled(true);
-        else if(status == 1)
+            pass.setEnabled(true);
+        }
+        if(person == 2) {
             go.setEnabled(false);
+            pass.setEnabled(false);
+        }
 
         //a=extras.getStringArrayList("chances");
         //list=extras.getString("chance");
@@ -81,8 +91,10 @@ public class FirstPlayerGame extends AppCompatActivity {
 
         pubnub = new Pubnub("pub-c-4aeb3dae-c48d-4f23-b3b2-e54d08bd88ce", "sub-c-fe640624-e5fa-11e5-aad5-02ee2ddab7fe");
         final TextView textView = (TextView)findViewById(R.id.textView4);
-        char a[]=totalList.toCharArray();
-        if(turn == 0){
+        textView.setText(currentCity);
+
+        if(turn == 0 && person==0){
+            char a[]=totalList.toCharArray();
             String n1="";
             for (int i = 0; i < a.length; i++) {
                 while (a[i] != ',') {
@@ -131,65 +143,101 @@ public class FirstPlayerGame extends AppCompatActivity {
                                 runOnUiThread(new Runnable() {
                                     @Override
                                     public void run() {
-                                        currentUser="";
+                                        currentCity="";
                                         currentChance="";
-                                        for (int i = 0; i < receivedName.length(); i++) {
+                                        int i=0;
                                             while (receivedName.charAt(i) != ',') {
-                                                currentUser = currentUser + receivedName.charAt(i++);
+                                                currentCity = currentCity + receivedName.charAt(i++);
                                             }
-                                            i++;
-                                            currentChance = currentChance + receivedName.charAt(i++);
+                                        i++;
+                                        Toast.makeText(getApplicationContext(),currentCity,Toast.LENGTH_SHORT).show();
+                                        if(!currentCity.equals(passChance)) {
+                                           // Toast.makeText(getApplicationContext(),chanceDecider.get(chanceNo)+","+username,Toast.LENGTH_SHORT).show();
+                                            textView.setText(currentCity);
+
+                                            allName.put(count, currentCity);
+                                            for(int j=i;j<receivedName.length();j++){
+                                                currentChance = currentChance + receivedName.charAt(i++);
+                                            }
                                             chanceNo = Integer.parseInt(currentChance);
-                                        }
-                                        Toast.makeText(getApplicationContext(),currentUser,Toast.LENGTH_SHORT).show();
-                                        if(!currentUser.equals(passChance)) {
-                                            Toast.makeText(getApplicationContext(),chanceDecider.get(chanceNo)+","+username,Toast.LENGTH_SHORT).show();
-                                            textView.setText(currentUser);
-                                            allName.put(count, currentUser);
                                             count++;
                                             if (chanceDecider.get(chanceNo).equals(username)) {
                                                 go.setEnabled(true);
-                                            } else
+                                                pass.setEnabled(true);
+                                            } else {
                                                 go.setEnabled(false);
+                                                pass.setEnabled(false);
+                                            }
                                         }
                                         else{
-                                            Toast.makeText(getApplicationContext(),"Else",Toast.LENGTH_SHORT).show();
-                                            if(!content.isEmpty() && content!=null) {
-                                                Toast.makeText(getApplicationContext(),"Else If",Toast.LENGTH_SHORT).show();
-                                                for (int i = 0; i < receivedName.length(); i++) {
+                                            //content=textView.getText().toString();
+                                           // Toast.makeText(getApplicationContext(),"Else",Toast.LENGTH_SHORT).show();
+                                            //if(!content.isEmpty() && content!=null)
+                                                currentCity="";
+                                                Toast.makeText(getApplicationContext(),receivedName,Toast.LENGTH_SHORT).show();
+                                                for (i = 0; i < receivedName.length(); i++) {
                                                     while (receivedName.charAt(i) != ',') {
-                                                        // currentUser = currentUser + receivedName.charAt(i++);
+                                                        i++;
+                                                        // currentCity = currentCity + receivedName.charAt(i++);
                                                     }
                                                     i++;
                                                     while (receivedName.charAt(i) != ',') {
-                                                        currentUser = currentUser + receivedName.charAt(i++);
+                                                        currentCity = currentCity + receivedName.charAt(i++);
                                                     }
                                                     i++;
                                                     currentChance = currentChance + receivedName.charAt(i++);
-                                                    chanceNo = Integer.parseInt(currentChance);
                                                 }
-                                                textView.setText(currentUser);
-                                                allName.put(count, currentUser);
+                                                    chanceNo = Integer.parseInt(currentChance);
+                                                Toast.makeText(getApplicationContext(),currentCity,Toast.LENGTH_SHORT).show();
+                                                textView.setText(currentCity);
+
+                                                allName.put(count, currentCity);
+                                                chanceNo = Integer.parseInt(currentChance);
+                                                count++;
+                                                if (chanceDecider.get(chanceNo).equals(username)) {
+                                                    pass.setEnabled(true);
+                                                    go.setEnabled(true);
+                                                } else {
+                                                    go.setEnabled(false);
+                                                    pass.setEnabled(false);
+                                                }
+
+                                            /*else{
+                                                //Toast.makeText(getApplicationContext(),"HERE",Toast.LENGTH_SHORT).show();
+                                                allName.put(count, currentCity);
                                                 count++;
                                                 if (chanceDecider.get(chanceNo).equals(username)) {
                                                     go.setEnabled(true);
                                                 } else
                                                     go.setEnabled(false);
-                                            }
-                                            else{
-                                                Toast.makeText(getApplicationContext(),"HERE",Toast.LENGTH_SHORT).show();
-                                                allName.put(count, currentUser);
-                                                count++;
-                                                if (chanceDecider.get(chanceNo).equals(username)) {
-                                                    go.setEnabled(true);
-                                                } else
-                                                    go.setEnabled(false);
-                                            }
+                                            }*/
 
                                         }
                                     }
                                 });
 
+                            }
+                            else  if(turn==0 && person==2) {
+                                list = message.toString();
+
+                                final char b[] = list.toCharArray();
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        Toast.makeText(getApplicationContext(),"List: "+list,Toast.LENGTH_SHORT).show();
+                                        String n1 = "";
+                                        for (int i = 0; i < b.length; i++) {
+                                            while (b[i] != ',') {
+                                                n1 = n1 + b[i++];
+                                            }
+                                            chanceDecider.put(kkk,n1);
+                                            score.put(n1,0);
+                                            kkk++;
+                                            n1="";
+                                        }
+                                        turn++;
+                                    }
+                                });
                             }
                         }
 
@@ -210,7 +258,7 @@ public class FirstPlayerGame extends AppCompatActivity {
         //db=openOrCreateDatabase("places", Context.MODE_PRIVATE, null);
         //db.execSQL("CREATE TABLE IF NOT EXISTS city (id INT,name VARCHAR);");
 
-        final EditText in1 = (EditText) findViewById(R.id.input_city);
+        in1 = (EditText) findViewById(R.id.input_city);
 
         System.out.println(chanceDecider.get(chanceNo));
         System.out.println(username);
@@ -224,6 +272,9 @@ public class FirstPlayerGame extends AppCompatActivity {
                     chanceNo=1;
                 }
                 points--;
+               // go.setEnabled(false);
+                //pass.setEnabled(false);
+                Toast.makeText(getApplicationContext(),points.toString(),Toast.LENGTH_SHORT).show();
                 score.put(username,points);
                 if(content.isEmpty() || content==null){
 
@@ -231,9 +282,18 @@ public class FirstPlayerGame extends AppCompatActivity {
                     });
                 }
                 else {
-                    pubnub.publish(password, "pass," + currentUser + "," + chanceNo, new Callback() {
-                    });
+                    pubnub.publish(password, "pass," + content + "," + chanceNo, new Callback() {
+                   });
                 }
+                in1.setText("");
+                /*Intent in=getIntent();
+                in.putExtra("status",1);
+                in.putExtra("person",1);
+                overridePendingTransition(0, 0);
+                in.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+                finish();
+                overridePendingTransition(0, 0);
+                startActivity(in);*/
             }
         });
 
@@ -246,7 +306,7 @@ public class FirstPlayerGame extends AppCompatActivity {
                     Toast.makeText(getApplicationContext(), "Incorrect input", Toast.LENGTH_SHORT).show();
                     Intent in = getIntent();
                     in.putExtra("status",0);
-
+                    in.putExtra("person",1);
 
                     overridePendingTransition(0, 0);
                     in.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
@@ -254,7 +314,7 @@ public class FirstPlayerGame extends AppCompatActivity {
                     overridePendingTransition(0, 0);
                     startActivity(in);
                 } else {
-                    GetCity getcitymethod = new GetCity();
+                    getcitymethod = new GetCity();
                     getcitymethod.execute();
                 }
             }
@@ -268,7 +328,7 @@ public class FirstPlayerGame extends AppCompatActivity {
             runOnUiThread(new Runnable() {
                 public void run() {
                     // Check for success tag
-                    int success;
+                    Integer success;
                     // String response;
                     try {
                         // Building Parameters
@@ -285,16 +345,16 @@ public class FirstPlayerGame extends AppCompatActivity {
                         Log.e("Get User Details", json.toString());
                         success = json.getInt(TAG_SUCCESS);
                         //JSONObject jsonObject=new JSONObject(json.toString());
+                        Toast.makeText(getApplicationContext(),"success:"+success.toString(),Toast.LENGTH_SHORT).show();
 
-
-                        // response = json.getString(TAG_NAME);
+                        //String responseCity = json.getString(TAG_NAME);
                         System.out.println("hello");
                         Log.e("Get User Details", json.toString());
                         System.out.println("hello");
                         //Log.isLoggable(TAG,success);
                         if (success == 1) {
                             System.out.println("hello");
-                            Toast.makeText(getApplicationContext(), "got the city", Toast.LENGTH_LONG);
+                           // Toast.makeText(getApplicationContext(), "got the city", Toast.LENGTH_LONG);
 
                             //  JSONArray places = json.getJSONArray(TAG_NAME); // JSON Array
                             // System.out.println(response);
@@ -308,13 +368,13 @@ public class FirstPlayerGame extends AppCompatActivity {
 
                             // int c=db.getCityCount(name);
                             int j=0,check=0;
-                            System.out.println(count);
+                           // System.out.println(count);
                             Iterator listIterator=allName.entrySet().iterator();
-                            System.out.println(count);
-                            System.out.println(allName.size());
+                            //System.out.println(count);
+                            //System.out.println(allName.size());
                             while(listIterator.hasNext())
                             {
-                                System.out.println(count);
+                                //System.out.println(count);
                                 Map.Entry pair = (Map.Entry)listIterator.next();
                                 if(pair.getValue().equals(name)){
 
@@ -326,20 +386,23 @@ public class FirstPlayerGame extends AppCompatActivity {
                             {
 
 
-                                System.out.println(listIterator.next());
+                                //System.out.println(listIterator.next());
                             }
                             //Log.isLoggable(TAG, c);
                             //Cursor c=db.rawQuery("SELECT * FROM city WHERE name = '"+cityName.getString(TAG_NAME) +"'",null);
                             if(check==1){
                                 Log.v(TAG,"checkin");
                                 Toast.makeText(getApplicationContext(),"Place already used",Toast.LENGTH_SHORT).show();
-                                Intent in=getIntent();
+                                in1.setText("");
+                                getcitymethod.cancel(true);
+                                /*Intent in=getIntent();
                                 in.putExtra("status",0);
+                                in.putExtra("person",1);
                                 overridePendingTransition(0, 0);
                                 in.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
                                 finish();
                                 overridePendingTransition(0, 0);
-                                startActivity(in);
+                                startActivity(in);*/
                             }
                             else {
                                 Log.v(TAG, "in");
@@ -359,29 +422,39 @@ public class FirstPlayerGame extends AppCompatActivity {
                                 if(chanceNo>chanceDecider.size()){
                                     chanceNo=1;
                                 }
+                               // go.setEnabled(false);
+                               // pass.setEnabled(false);
+                               in1.setText("");
                                 pubnub.publish(password, name + "," + chanceNo, new Callback() {
                                 });
-
-                                Intent in=getIntent();
+                                getcitymethod.cancel(true);
+                               if( getcitymethod.isCancelled())
+                                   Toast.makeText(getApplicationContext(),"true",Toast.LENGTH_SHORT).show();
+                               /*Intent in=getIntent();
                                 in.putExtra("status",1);
+                                in.putExtra("person",1);
                                 overridePendingTransition(0, 0);
                                 in.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
                                 finish();
                                 overridePendingTransition(0, 0);
-                                startActivity(in);
-                                //go.setEnabled(false);
+                                startActivity(in);*/
+
                             }
                             //Log.v(TAG, cityName.getString(TAG_NAME));
                             name="";
                         } else {
                             Toast.makeText(getApplicationContext(), "Place not found", Toast.LENGTH_SHORT).show();
-                            Intent in=getIntent();
+                            in1.setText("");
+                            getcitymethod.cancel(true);
+                            /*Intent in=getIntent();
                             in.putExtra("status",0);
+                            in.putExtra("person",1);
                             overridePendingTransition(0, 0);
                             in.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+
                             finish();
                             overridePendingTransition(0, 0);
-                            startActivity(in);
+                            startActivity(in);*/
                         }
                     } catch (JSONException e) {
                     }
