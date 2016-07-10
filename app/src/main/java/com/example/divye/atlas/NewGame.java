@@ -11,16 +11,13 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.pubnub.api.Callback;
 import com.pubnub.api.Pubnub;
 import com.pubnub.api.PubnubError;
 import com.pubnub.api.PubnubException;
-
 import org.json.JSONException;
 import org.json.JSONArray;
 import org.json.JSONObject;
-
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -43,7 +40,7 @@ public class NewGame extends AppCompatActivity {
     //ArrayList<String> a=new ArrayList<>();
     JSONParser jParser = new JSONParser();
 
-    private static String url = "http://192.168.0.101/android_connect/getname.php";
+    private static String url = "http://192.168.0.101/atlas/getname.php";
     Pubnub pubnub;
     String name;
     private static final String TAG_SUCCESS = "success";

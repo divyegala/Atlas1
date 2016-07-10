@@ -1,12 +1,16 @@
 package com.example.divye.atlas;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.StrictMode;
+import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -28,7 +32,7 @@ import java.util.Iterator;
 import java.util.ListIterator;
 import java.util.Map;
 
-public class FirstPlayerGame extends AppCompatActivity {
+public class FirstPlayerGame extends Fragment {
 
     //SQLiteDatabase db;
     //DatabaseHandler db = new DatabaseHandler(this);
@@ -44,7 +48,7 @@ public class FirstPlayerGame extends AppCompatActivity {
     EditText in1;
     GetCity getcitymethod = null;
 
-    private static String url = "http://192.168.0.107/android_connect/getname.php";
+    private static String url = "http://192.168.0.102/atlas/getname.php";
     Pubnub pubnub;
     String name;
     private static final String TAG_SUCCESS = "success";
@@ -59,21 +63,29 @@ public class FirstPlayerGame extends AppCompatActivity {
     Integer person;
     static String username,receivedName,totalList,currentCity="",currentChance,passChance="pass";
     static StringBuffer curCity = new StringBuffer("");
+    View v;
+    Activity a;
+    int status;
+
+    public FirstPlayerGame() {
+        // Required empty public constructor
+    }
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_new_game);
+
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         if (android.os.Build.VERSION.SDK_INT > 9) {
             StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder()
                     .permitAll().build();
             StrictMode.setThreadPolicy(policy);
         }
-        go = (Button) findViewById(R.id.go);
-        pass = (Button) findViewById(R.id.pass);
-        Bundle extras=getIntent().getExtras();
-        int status=extras.getInt("status");
-        person=extras.getInt("person");
-        Toast.makeText(getApplicationContext(),person.toString(),Toast.LENGTH_SHORT).show();
+         v =inflater.inflate(R.layout.activity_new_game, container, false);
+         a=getActivity();
+        go = (Button)v.findViewById(R.id.go);
+        pass = (Button) v.findViewById(R.id.pass);
+         Bundle extras=getArguments();
+         int status=extras.getInt("status");
+         person=extras.getInt("person");
+        Toast.makeText(a,person.toString(),Toast.LENGTH_SHORT).show();
         if(person == 0 || status == 0) {
             go.setEnabled(true);
             pass.setEnabled(true);
@@ -90,7 +102,7 @@ public class FirstPlayerGame extends AppCompatActivity {
         username=extras.getString("username");
 
         pubnub = new Pubnub("pub-c-4aeb3dae-c48d-4f23-b3b2-e54d08bd88ce", "sub-c-fe640624-e5fa-11e5-aad5-02ee2ddab7fe");
-        final TextView textView = (TextView)findViewById(R.id.textView4);
+        final TextView textView = (TextView)v.findViewById(R.id.textView4);
         textView.setText(currentCity);
 
         if(turn == 0 && person==0){
@@ -140,7 +152,7 @@ public class FirstPlayerGame extends AppCompatActivity {
                             if(turn!=0){
 
                                 receivedName=message.toString();
-                                runOnUiThread(new Runnable() {
+                                a.runOnUiThread(new Runnable() {
                                     @Override
                                     public void run() {
                                         currentCity="";
@@ -150,7 +162,7 @@ public class FirstPlayerGame extends AppCompatActivity {
                                                 currentCity = currentCity + receivedName.charAt(i++);
                                             }
                                         i++;
-                                        Toast.makeText(getApplicationContext(),currentCity,Toast.LENGTH_SHORT).show();
+                                        Toast.makeText(a,currentCity,Toast.LENGTH_SHORT).show();
                                         if(!currentCity.equals(passChance)) {
                                            // Toast.makeText(getApplicationContext(),chanceDecider.get(chanceNo)+","+username,Toast.LENGTH_SHORT).show();
                                             textView.setText(currentCity);
@@ -174,7 +186,7 @@ public class FirstPlayerGame extends AppCompatActivity {
                                            // Toast.makeText(getApplicationContext(),"Else",Toast.LENGTH_SHORT).show();
                                             //if(!content.isEmpty() && content!=null)
                                                 currentCity="";
-                                                Toast.makeText(getApplicationContext(),receivedName,Toast.LENGTH_SHORT).show();
+                                                Toast.makeText(a,receivedName,Toast.LENGTH_SHORT).show();
                                                 for (i = 0; i < receivedName.length(); i++) {
                                                     while (receivedName.charAt(i) != ',') {
                                                         i++;
@@ -188,7 +200,7 @@ public class FirstPlayerGame extends AppCompatActivity {
                                                     currentChance = currentChance + receivedName.charAt(i++);
                                                 }
                                                     chanceNo = Integer.parseInt(currentChance);
-                                                Toast.makeText(getApplicationContext(),currentCity,Toast.LENGTH_SHORT).show();
+                                                Toast.makeText(a,currentCity,Toast.LENGTH_SHORT).show();
                                                 textView.setText(currentCity);
 
                                                 allName.put(count, currentCity);
@@ -221,10 +233,10 @@ public class FirstPlayerGame extends AppCompatActivity {
                                 list = message.toString();
 
                                 final char b[] = list.toCharArray();
-                                runOnUiThread(new Runnable() {
+                                a.runOnUiThread(new Runnable() {
                                     @Override
                                     public void run() {
-                                        Toast.makeText(getApplicationContext(),"List: "+list,Toast.LENGTH_SHORT).show();
+                                        Toast.makeText(a,"List: "+list,Toast.LENGTH_SHORT).show();
                                         String n1 = "";
                                         for (int i = 0; i < b.length; i++) {
                                             while (b[i] != ',') {
@@ -258,7 +270,7 @@ public class FirstPlayerGame extends AppCompatActivity {
         //db=openOrCreateDatabase("places", Context.MODE_PRIVATE, null);
         //db.execSQL("CREATE TABLE IF NOT EXISTS city (id INT,name VARCHAR);");
 
-        in1 = (EditText) findViewById(R.id.input_city);
+        in1 = (EditText)v. findViewById(R.id.input_city);
 
         System.out.println(chanceDecider.get(chanceNo));
         System.out.println(username);
@@ -274,7 +286,7 @@ public class FirstPlayerGame extends AppCompatActivity {
                 points--;
                // go.setEnabled(false);
                 //pass.setEnabled(false);
-                Toast.makeText(getApplicationContext(),points.toString(),Toast.LENGTH_SHORT).show();
+                Toast.makeText(a,points.toString(),Toast.LENGTH_SHORT).show();
                 score.put(username,points);
                 if(content.isEmpty() || content==null){
 
@@ -303,15 +315,15 @@ public class FirstPlayerGame extends AppCompatActivity {
                 String inputCity = in1.getText().toString();
                 name = inputCity.toLowerCase();
                 if (name.length() < 3) {
-                    Toast.makeText(getApplicationContext(), "Incorrect input", Toast.LENGTH_SHORT).show();
-                    Intent in = getIntent();
+                    Toast.makeText(a, "Incorrect input", Toast.LENGTH_SHORT).show();
+                    Intent in = a.getIntent();
                     in.putExtra("status",0);
                     in.putExtra("person",1);
 
-                    overridePendingTransition(0, 0);
+                    a.overridePendingTransition(0, 0);
                     in.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
-                    finish();
-                    overridePendingTransition(0, 0);
+                    a.finish();
+                   a. overridePendingTransition(0, 0);
                     startActivity(in);
                 } else {
                     getcitymethod = new GetCity();
@@ -319,13 +331,15 @@ public class FirstPlayerGame extends AppCompatActivity {
                 }
             }
         });
+        return v;
     }
+
 
     class GetCity extends AsyncTask<String, String, String> {
 
         protected String doInBackground(String... params) {
 
-            runOnUiThread(new Runnable() {
+            a.runOnUiThread(new Runnable() {
                 public void run() {
                     // Check for success tag
                     Integer success;
@@ -345,7 +359,7 @@ public class FirstPlayerGame extends AppCompatActivity {
                         Log.e("Get User Details", json.toString());
                         success = json.getInt(TAG_SUCCESS);
                         //JSONObject jsonObject=new JSONObject(json.toString());
-                        Toast.makeText(getApplicationContext(),"success:"+success.toString(),Toast.LENGTH_SHORT).show();
+                        Toast.makeText(a,"success:"+success.toString(),Toast.LENGTH_SHORT).show();
 
                         //String responseCity = json.getString(TAG_NAME);
                         System.out.println("hello");
@@ -392,7 +406,7 @@ public class FirstPlayerGame extends AppCompatActivity {
                             //Cursor c=db.rawQuery("SELECT * FROM city WHERE name = '"+cityName.getString(TAG_NAME) +"'",null);
                             if(check==1){
                                 Log.v(TAG,"checkin");
-                                Toast.makeText(getApplicationContext(),"Place already used",Toast.LENGTH_SHORT).show();
+                                Toast.makeText(a,"Place already used",Toast.LENGTH_SHORT).show();
                                 in1.setText("");
                                 getcitymethod.cancel(true);
                                 /*Intent in=getIntent();
@@ -417,7 +431,7 @@ public class FirstPlayerGame extends AppCompatActivity {
                                 count++;
                                 //db.addCity(c1);
                                 //db.execSQL("INSERT INTO city VALUES(count,'" + cityName.getString(TAG_NAME) + "')");
-                                Toast.makeText(getApplicationContext(), "Correct!", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(a, "Correct!", Toast.LENGTH_SHORT).show();
                                 chanceNo++;
                                 if(chanceNo>chanceDecider.size()){
                                     chanceNo=1;
@@ -429,7 +443,7 @@ public class FirstPlayerGame extends AppCompatActivity {
                                 });
                                 getcitymethod.cancel(true);
                                if( getcitymethod.isCancelled())
-                                   Toast.makeText(getApplicationContext(),"true",Toast.LENGTH_SHORT).show();
+                                   Toast.makeText(a,"true",Toast.LENGTH_SHORT).show();
                                /*Intent in=getIntent();
                                 in.putExtra("status",1);
                                 in.putExtra("person",1);
@@ -443,7 +457,7 @@ public class FirstPlayerGame extends AppCompatActivity {
                             //Log.v(TAG, cityName.getString(TAG_NAME));
                             name="";
                         } else {
-                            Toast.makeText(getApplicationContext(), "Place not found", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(a, "Place not found", Toast.LENGTH_SHORT).show();
                             in1.setText("");
                             getcitymethod.cancel(true);
                             /*Intent in=getIntent();

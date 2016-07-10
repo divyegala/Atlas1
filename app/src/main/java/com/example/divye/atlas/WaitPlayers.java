@@ -103,7 +103,7 @@ public class WaitPlayers extends AppCompatActivity {
 
                 pubnub.publish(password, r, new Callback() {
                 });
-                Intent intent = new Intent(getApplicationContext(),FirstPlayerGame.class);
+                Intent intent = new Intent(getApplicationContext(),tabbed.class);
                 intent.putExtra("totalList",r);
                 intent.putExtra("username",username);
                 //intent.putStringArrayListExtra("chances",a);
