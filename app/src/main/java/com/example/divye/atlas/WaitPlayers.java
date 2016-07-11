@@ -108,6 +108,7 @@ public class WaitPlayers extends AppCompatActivity {
                 intent.putExtra("username",username);
                 //intent.putStringArrayListExtra("chances",a);
                 intent.putExtra("password",password);
+                intent.putExtra("person",0);
                 startActivity(intent);
 
                     //System.out.println(a1[0].toString());

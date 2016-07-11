@@ -48,7 +48,7 @@ public class FirstPlayerGame extends Fragment {
     EditText in1;
     GetCity getcitymethod = null;
 
-    private static String url = "http://192.168.0.102/atlas/getname.php";
+    private static String url = "http://192.168.0.107/android_connect/getname.php";
     Pubnub pubnub;
     String name;
     private static final String TAG_SUCCESS = "success";
@@ -106,18 +106,20 @@ public class FirstPlayerGame extends Fragment {
         textView.setText(currentCity);
 
         if(turn == 0 && person==0){
-            char a[]=totalList.toCharArray();
+            char a11[]=totalList.toCharArray();
             String n1="";
-            for (int i = 0; i < a.length; i++) {
-                while (a[i] != ',') {
-                    n1 = n1 + a[i++];
+            for (int i = 0; i < a11.length; i++) {
+                while (a11[i] != ',') {
+                    n1 = n1 + a11[i++];
                 }
                 chanceDecider.put(kkk,n1);
                 kkk++;
                 n1="";
                 turn++;
             }
+            Toast.makeText(a,"Size:"+chanceDecider.size(),Toast.LENGTH_SHORT).show();
         }
+
         Iterator listIterator = chanceDecider.entrySet().iterator();
         while (listIterator.hasNext()){
             System.out.println(listIterator.next());
@@ -272,8 +274,8 @@ public class FirstPlayerGame extends Fragment {
 
         in1 = (EditText)v. findViewById(R.id.input_city);
 
-        System.out.println(chanceDecider.get(chanceNo));
-        System.out.println(username);
+        //System.out.println(chanceDecider.get(chanceNo));
+        //System.out.println(username);
 
         pass.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -316,7 +318,8 @@ public class FirstPlayerGame extends Fragment {
                 name = inputCity.toLowerCase();
                 if (name.length() < 3) {
                     Toast.makeText(a, "Incorrect input", Toast.LENGTH_SHORT).show();
-                    Intent in = a.getIntent();
+                    in1.setText("");
+                    /*Intent in = a.getIntent();
                     in.putExtra("status",0);
                     in.putExtra("person",1);
 
@@ -324,7 +327,7 @@ public class FirstPlayerGame extends Fragment {
                     in.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
                     a.finish();
                    a. overridePendingTransition(0, 0);
-                    startActivity(in);
+                    startActivity(in);*/
                 } else {
                     getcitymethod = new GetCity();
                     getcitymethod.execute();
@@ -436,6 +439,7 @@ public class FirstPlayerGame extends Fragment {
                                 if(chanceNo>chanceDecider.size()){
                                     chanceNo=1;
                                 }
+                                Toast.makeText(a,"next chance:"+chanceNo+","+chanceDecider.size(),Toast.LENGTH_SHORT).show();
                                // go.setEnabled(false);
                                // pass.setEnabled(false);
                                in1.setText("");

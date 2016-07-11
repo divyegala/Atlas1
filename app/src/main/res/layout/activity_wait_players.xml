@@ -22,7 +22,8 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:layout_above="@+id/start_game"
-        android:background="#fff"
+        android:padding="10dp"
+        android:background="@drawable/rounded_edittext"
         android:layout_marginTop="50dp"/>
 
     <Button

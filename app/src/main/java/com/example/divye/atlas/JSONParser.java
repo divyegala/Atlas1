@@ -109,6 +109,7 @@ public class JSONParser {
             InputStream in = new BufferedInputStream(conn.getInputStream());
             BufferedReader reader = new BufferedReader(new InputStreamReader(in));
 
+            result.setLength(0);
             String line;
             while ((line = reader.readLine()) != null) {
                 result.append(line);
