@@ -10,6 +10,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -129,16 +130,15 @@ public class tabbed extends AppCompatActivity {
             switch (position){
                 case 0:
                     Fragment f1=new FirstPlayerGame();
+                 // Log.e("BUNDEL",extras.getString("totallist"));
                     f1.setArguments(extras);
                     return f1;
                 case 1:
-                    Fragment f2=new FirstPlayerGame();
-                    f2.setArguments(extras);
-                    return f2;
+
+                    return new BlankFragment();
                 case 2:
-                    Fragment f3=new FirstPlayerGame();
-                    f3.setArguments(extras);
-                    return f3;
+
+                    return new BlankFragment();
             }
             return PlaceholderFragment.newInstance(position + 1);
         }

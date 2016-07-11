@@ -39,7 +39,7 @@ public class FirstPlayerGame extends Fragment {
     //int allID = new int[100];
     static HashMap<Integer,String> allName = new HashMap<Integer,String>();
     static HashMap<Integer,String> chanceDecider = new HashMap<>();
-    static HashMap<String,Integer> score= new HashMap<>();
+   // static HashMap<String,Integer> score= new HashMap<>();
     static Integer points=0;
     //ArrayList<String> a=new ArrayList<>();
     JSONParser jParser = new JSONParser();
@@ -47,8 +47,7 @@ public class FirstPlayerGame extends Fragment {
     Button pass;
     EditText in1;
     GetCity getcitymethod = null;
-
-    private static String url = "http://192.168.0.107/android_connect/getname.php";
+    private static String url = "http://192.168.0.102/atlas/getname.php";
     Pubnub pubnub;
     String name;
     private static final String TAG_SUCCESS = "success";
@@ -66,7 +65,8 @@ public class FirstPlayerGame extends Fragment {
     View v;
     Activity a;
     int status;
-
+    TextView score;
+    int scr=0;
     public FirstPlayerGame() {
         // Required empty public constructor
     }
@@ -82,6 +82,7 @@ public class FirstPlayerGame extends Fragment {
          a=getActivity();
         go = (Button)v.findViewById(R.id.go);
         pass = (Button) v.findViewById(R.id.pass);
+        score=(TextView) v.findViewById(R.id.text_score);
          Bundle extras=getArguments();
          int status=extras.getInt("status");
          person=extras.getInt("person");
@@ -105,21 +106,18 @@ public class FirstPlayerGame extends Fragment {
         final TextView textView = (TextView)v.findViewById(R.id.textView4);
         textView.setText(currentCity);
 
-        if(turn == 0 && person==0){
-            char a11[]=totalList.toCharArray();
+        if(turn == 0 && person==0){char a[]=totalList.toCharArray();
             String n1="";
-            for (int i = 0; i < a11.length; i++) {
-                while (a11[i] != ',') {
-                    n1 = n1 + a11[i++];
+            for (int i = 0; i < a.length; i++) {
+                while (a[i] != ',') {
+                    n1 = n1 + a[i++];
                 }
                 chanceDecider.put(kkk,n1);
                 kkk++;
                 n1="";
                 turn++;
             }
-            Toast.makeText(a,"Size:"+chanceDecider.size(),Toast.LENGTH_SHORT).show();
         }
-
         Iterator listIterator = chanceDecider.entrySet().iterator();
         while (listIterator.hasNext()){
             System.out.println(listIterator.next());
@@ -245,7 +243,7 @@ public class FirstPlayerGame extends Fragment {
                                                 n1 = n1 + b[i++];
                                             }
                                             chanceDecider.put(kkk,n1);
-                                            score.put(n1,0);
+                                            //score.put(n1,0);
                                             kkk++;
                                             n1="";
                                         }
@@ -274,8 +272,8 @@ public class FirstPlayerGame extends Fragment {
 
         in1 = (EditText)v. findViewById(R.id.input_city);
 
-        //System.out.println(chanceDecider.get(chanceNo));
-        //System.out.println(username);
+        System.out.println(chanceDecider.get(chanceNo));
+        System.out.println(username);
 
         pass.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -285,11 +283,12 @@ public class FirstPlayerGame extends Fragment {
                 if(chanceNo>chanceDecider.size()){
                     chanceNo=1;
                 }
-                points--;
+                scr=-10;
+                score.setText("Score: "+scr);
                // go.setEnabled(false);
                 //pass.setEnabled(false);
                 Toast.makeText(a,points.toString(),Toast.LENGTH_SHORT).show();
-                score.put(username,points);
+                //score.put(username,points);
                 if(content.isEmpty() || content==null){
 
                     pubnub.publish(password,"pass,"+chanceNo, new Callback() {
@@ -435,19 +434,20 @@ public class FirstPlayerGame extends Fragment {
                                 //db.addCity(c1);
                                 //db.execSQL("INSERT INTO city VALUES(count,'" + cityName.getString(TAG_NAME) + "')");
                                 Toast.makeText(a, "Correct!", Toast.LENGTH_SHORT).show();
+                                scr=scr+10;
+                                score.setText("Score :"+scr);
                                 chanceNo++;
                                 if(chanceNo>chanceDecider.size()){
                                     chanceNo=1;
                                 }
-                                Toast.makeText(a,"next chance:"+chanceNo+","+chanceDecider.size(),Toast.LENGTH_SHORT).show();
                                // go.setEnabled(false);
                                // pass.setEnabled(false);
                                in1.setText("");
                                 pubnub.publish(password, name + "," + chanceNo, new Callback() {
                                 });
                                 getcitymethod.cancel(true);
-                               if( getcitymethod.isCancelled())
-                                   Toast.makeText(a,"true",Toast.LENGTH_SHORT).show();
+                               if( getcitymethod.isCancelled());
+                                   //Toast.makeText(a,"true",Toast.LENGTH_SHORT).show();
                                /*Intent in=getIntent();
                                 in.putExtra("status",1);
                                 in.putExtra("person",1);

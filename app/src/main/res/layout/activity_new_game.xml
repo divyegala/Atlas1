@@ -11,12 +11,13 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/textView5"
-        android:text="Current Player:"
+        android:id="@+id/text_score"
+        android:text="Score: 0"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="40dp"
+        android:layout_marginTop="25dp"
         android:textSize="30dp"
         android:textColor="#fff"
+        android:textAlignment="center"
     />
     <TextView
         android:layout_width="match_parent"
