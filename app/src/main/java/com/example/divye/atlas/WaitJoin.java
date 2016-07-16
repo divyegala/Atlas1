@@ -4,34 +4,27 @@ import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
-import android.widget.Button;
 import android.widget.TextView;
 
-import com.pubnub.api.*;
+import com.pubnub.api.Callback;
+import com.pubnub.api.Pubnub;
+import com.pubnub.api.PubnubError;
+import com.pubnub.api.PubnubException;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-
-public class WaitPlayers extends AppCompatActivity {
+public class WaitJoin extends AppCompatActivity {
 
     Pubnub pubnub;
-    TextView textView;
-    static Integer key = 1;
     String messages;
-    static ArrayList<String> a = new ArrayList<>();
-
+    Intent intent;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_wait_players);
+        setContentView(R.layout.activity_wait_join);
 
         Bundle extras = getIntent().getExtras();
         final String password = extras.getString("password");
-        textView = (TextView)findViewById(R.id.textView);
         final String username = extras.getString("username");
-        Integer priority=0;
-        a.add(priority,username);
+
         pubnub = new Pubnub("pub-c-4aeb3dae-c48d-4f23-b3b2-e54d08bd88ce", "sub-c-fe640624-e5fa-11e5-aad5-02ee2ddab7fe");
 
         try {
@@ -61,18 +54,15 @@ public class WaitPlayers extends AppCompatActivity {
                             System.out.println("SUBSCRIBE : " + channel + " : "
                                     + message.getClass() + " : " + message.toString());
                             messages = message.toString();
-                            Log.v("WaitPlayers",messages);
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-
-                                    a.add(key, messages);
-                                    key++;
-                                    textView.append("\n"+messages);
-                                    messages = "";
-                                }
-                            });
-
+                            String start="start";
+                            if(message.equals(start)){
+                                intent=new Intent(getApplicationContext(),tabbed.class);
+                                intent.putExtra("username",username);
+                                intent.putExtra("password",password);
+                                //intent.putExtra("status",1);
+                                intent.putExtra("person",2);
+                                startActivity(intent);
+                            }
                         }
 
                         @Override
@@ -85,41 +75,5 @@ public class WaitPlayers extends AppCompatActivity {
 
         } catch (PubnubException e) {
         }
-        Button start_game = (Button)findViewById(R.id.start_game);
-        start_game.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-                String r = "";
-                Iterator itr=a.iterator();
-                while(itr.hasNext()){
-                    //Log.v("ArrayList",(String)itr);
-                    r = r + (String)itr.next();
-                    r = r + ",";
-                    //  String s = r.toString();
-                    //Log.v("NewGame",r);
-                }
-                Log.v("List of usernames",r);
-
-                pubnub.publish(password, "start", new Callback() {
-                });
-                Intent intent = new Intent(getApplicationContext(),tabbed.class);
-                intent.putExtra("totalList",r);
-                intent.putExtra("username",username);
-                //intent.putStringArrayListExtra("chances",a);
-                intent.putExtra("person",0);
-                intent.putExtra("password",password);
-                intent.putExtra("person",0);
-                try {
-                    Thread.sleep(1000);
-                }
-                catch (Exception e){
-
-                }
-                startActivity(intent);
-
-                    //System.out.println(a1[0].toString());
-            }
-        });
     }
 }

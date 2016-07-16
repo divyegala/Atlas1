@@ -94,11 +94,11 @@ public class JoinGame extends AppCompatActivity {
                 } catch (PubnubException e) {
                     e.printStackTrace();
                 }
-                Intent intent = new Intent(getApplicationContext(),tabbed.class);
+                Intent intent = new Intent(getApplicationContext(),WaitJoin.class);
                 intent.putExtra("username",username);
                 intent.putExtra("password",password);
                 //intent.putExtra("status",1);
-                intent.putExtra("person",2);
+                //intent.putExtra("person",2);
                 startActivity(intent);
                // System.out.println("hello");
 
