@@ -38,10 +38,11 @@ public class FirstPlayerGame extends Fragment {
     //DatabaseHandler db = new DatabaseHandler(this);
     //int allID = new int[100];
     static HashMap<Integer,String> allName = new HashMap<Integer,String>();
-    static HashMap<Integer,String> chanceDecider = new HashMap<>();
+    public static HashMap<Integer,String> chanceDecider = new HashMap<>();
    public static HashMap<String,Integer> scoreAll= new HashMap<>();
     static Integer points=0;
     //ArrayList<String> a=new ArrayList<>();
+    public static Integer yourChanceNo=0;
     JSONParser jParser = new JSONParser();
     Button go;
     Button pass;
@@ -49,7 +50,7 @@ public class FirstPlayerGame extends Fragment {
     GetCity getcitymethod = null;
     private static String url = "http://192.168.0.107/android_connect/getname.php";
     Pubnub pubnub;
-    String name;
+    String name,exit="exit_game";
     private static final String TAG_SUCCESS = "success";
     private static final String TAG_ID = "id";
     private static final String TAG_NAME = "name";
@@ -92,11 +93,14 @@ public class FirstPlayerGame extends Fragment {
             go.setEnabled(true);
             pass.setEnabled(true);
             score.setText("Current User: "+username);
+            tabbed.isTurn=true;
+            yourChanceNo=1;
         }
         if(person == 2) {
             go.setEnabled(false);
             pass.setEnabled(false);
             score.setText("");
+            tabbed.isTurn=false;
         }
 
         //a=extras.getStringArrayList("chances");
@@ -177,7 +181,7 @@ public class FirstPlayerGame extends Fragment {
                                             }
                                         i++;
                                         Toast.makeText(a,currentCity,Toast.LENGTH_SHORT).show();
-                                        if(!currentCity.equals(passChance)) {
+                                        if(!currentCity.equals(passChance) && !currentCity.equals(exit)) {
                                            // Toast.makeText(getApplicationContext(),chanceDecider.get(chanceNo)+","+username,Toast.LENGTH_SHORT).show();
                                             textView.setText(currentCity);
 
@@ -202,15 +206,51 @@ public class FirstPlayerGame extends Fragment {
                                                 go.setEnabled(true);
                                                 pass.setEnabled(true);
                                                 score.setText("Current User: "+username);
+                                                tabbed.isTurn=true;
+                                                yourChanceNo=chanceNo;
                                             } else {
                                                 go.setEnabled(false);
                                                 pass.setEnabled(false);
                                                 score.setText("");
+                                                tabbed.isTurn=false;
+                                            }
+                                        }
+                                        else if(currentCity.equals(exit)){
+                                            while(i<receivedName.length()){
+                                                currentChance = currentChance + receivedName.charAt(i++);
+                                            }
+                                            chanceNo = Integer.parseInt(currentChance);
+                                            //chanceDecider.remove(chanceNo);
+                                            if(yourChanceNo!=chanceNo){
+                                                if(chanceNo<chanceDecider.size()){
+                                                    for(int l=chanceNo;l<chanceDecider.size();l++){
+                                                        chanceDecider.put(l,chanceDecider.get(l+1));
+                                                        chanceDecider.remove(l+1);
+                                                    }
+                                                }
+                                                else if(chanceNo==chanceDecider.size()){
+                                                    chanceDecider.remove(chanceNo);
+                                                }
+                                                if(chanceNo>chanceDecider.size())
+                                                    chanceNo=1;
+                                                Toast.makeText(a,"Now:"+chanceDecider.get(chanceNo),Toast.LENGTH_SHORT).show();
+                                                if (chanceDecider.get(chanceNo).equals(username)) {
+                                                    go.setEnabled(true);
+                                                    pass.setEnabled(true);
+                                                    score.setText("Current User: "+username);
+                                                    tabbed.isTurn=true;
+                                                    //yourChanceNo=chanceNo;
+                                                } else {
+                                                    go.setEnabled(false);
+                                                    pass.setEnabled(false);
+                                                    score.setText("");
+                                                    tabbed.isTurn=false;
+                                                }
                                             }
                                         }
                                         else{
                                             //content=textView.getText().toString();
-                                           // Toast.makeText(getApplicationContext(),"Else",Toast.LENGTH_SHORT).show();
+                                           //Toast.makeText(getApplicationContext(),"Else",Toast.LENGTH_SHORT).show();
                                             //if(!content.isEmpty() && content!=null)
                                                 currentCity="";
                                                 Toast.makeText(a,receivedName,Toast.LENGTH_SHORT).show();
@@ -250,21 +290,13 @@ public class FirstPlayerGame extends Fragment {
                                                     pass.setEnabled(true);
                                                     go.setEnabled(true);
                                                     score.setText("Current User: "+username);
+                                                    tabbed.isTurn=true;
                                                 } else {
                                                     go.setEnabled(false);
                                                     pass.setEnabled(false);
                                                     score.setText("");
+                                                    tabbed.isTurn=false;
                                                 }
-
-                                            /*else{
-                                                //Toast.makeText(getApplicationContext(),"HERE",Toast.LENGTH_SHORT).show();
-                                                allName.put(count, currentCity);
-                                                count++;
-                                                if (chanceDecider.get(chanceNo).equals(username)) {
-                                                    go.setEnabled(true);
-                                                } else
-                                                    go.setEnabled(false);
-                                            }*/
 
                                         }
                                     }
@@ -286,6 +318,9 @@ public class FirstPlayerGame extends Fragment {
                                             }
                                             chanceDecider.put(kkk,n1);
                                             //score.put(n1,0);
+                                            if(n1.equals(username)){
+                                                yourChanceNo=kkk;
+                                            }
                                             kkk++;
                                             n1="";
                                         }
@@ -327,11 +362,9 @@ public class FirstPlayerGame extends Fragment {
                 }
                 points=-10;
                 scoreAll.put(username,points);
-                //score.setText("Score: "+scr);
-               // go.setEnabled(false);
-                //pass.setEnabled(false);
+
                 Toast.makeText(a,points.toString(),Toast.LENGTH_SHORT).show();
-                //score.put(username,points);
+
                 if(content.isEmpty() || content==null){
 
                     pubnub.publish(password,"pass,"+chanceNo+","+points, new Callback() {
@@ -342,14 +375,7 @@ public class FirstPlayerGame extends Fragment {
                    });
                 }
                 in1.setText("");
-                /*Intent in=getIntent();
-                in.putExtra("status",1);
-                in.putExtra("person",1);
-                overridePendingTransition(0, 0);
-                in.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
-                finish();
-                overridePendingTransition(0, 0);
-                startActivity(in);*/
+
             }
         });
 
@@ -364,15 +390,7 @@ public class FirstPlayerGame extends Fragment {
                     Toast.makeText(a, "Incorrect input", Toast.LENGTH_SHORT).show();
                     in1.setText("");
                     check1=1;
-                    /*Intent in = a.getIntent();
-                    in.putExtra("status",0);
-                    in.putExtra("person",1);
 
-                    a.overridePendingTransition(0, 0);
-                    in.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
-                    a.finish();
-                   a. overridePendingTransition(0, 0);
-                    startActivity(in);*/
                 }
                 if(!content.isEmpty() && name.charAt(0)!=content.charAt(content.length()-1)){
                     Toast.makeText(a, "Last letter should match first letter of received place.", Toast.LENGTH_SHORT).show();

@@ -1,9 +1,11 @@
 package com.example.divye.atlas;
 
 import android.content.Intent;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.TextView;
 
 import com.pubnub.api.Callback;
@@ -54,7 +56,7 @@ public class WaitJoin extends AppCompatActivity {
                             System.out.println("SUBSCRIBE : " + channel + " : "
                                     + message.getClass() + " : " + message.toString());
                             messages = message.toString();
-                            String start="start";
+                            String start="start",end="exit_wait";
                             if(message.equals(start)){
                                 intent=new Intent(getApplicationContext(),tabbed.class);
                                 intent.putExtra("username",username);
@@ -62,6 +64,15 @@ public class WaitJoin extends AppCompatActivity {
                                 //intent.putExtra("status",1);
                                 intent.putExtra("person",2);
                                 startActivity(intent);
+                            }
+                            else if(message.equals(end)){
+
+                                Intent launchNextActivity;
+                                launchNextActivity = new Intent(getApplicationContext(), MainActivity.class);
+                                launchNextActivity.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                launchNextActivity.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                launchNextActivity.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+                                startActivity(launchNextActivity);
                             }
                         }
 
@@ -75,5 +86,16 @@ public class WaitJoin extends AppCompatActivity {
 
         } catch (PubnubException e) {
         }
+    }
+    @Override
+    public void onBackPressed(){
+        View layout=findViewById(R.id.parent);
+        Snackbar.make(layout, "Wait For Turn To Exit", Snackbar.LENGTH_LONG)
+                .setAction("CLOSE", new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+
+                    }
+                }).show();
     }
 }

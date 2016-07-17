@@ -1,7 +1,13 @@
 package com.example.divye.atlas;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
@@ -19,6 +25,9 @@ import android.view.ViewGroup;
 
 import android.widget.TextView;
 
+import com.pubnub.api.Callback;
+import com.pubnub.api.Pubnub;
+
 public class tabbed extends AppCompatActivity {
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -33,8 +42,11 @@ public class tabbed extends AppCompatActivity {
     /**
      * The {@link ViewPager} that will host the section contents.
      */
+    Pubnub pubnub = new Pubnub("pub-c-4aeb3dae-c48d-4f23-b3b2-e54d08bd88ce", "sub-c-fe640624-e5fa-11e5-aad5-02ee2ddab7fe");
     private ViewPager mViewPager;
     Bundle extras;
+    public static boolean isTurn=false;
+    String password,username;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,10 +63,42 @@ public class tabbed extends AppCompatActivity {
         mViewPager = (ViewPager) findViewById(R.id.container);
         mViewPager.setAdapter(mSectionsPagerAdapter);
          extras=getIntent().getExtras();
-
+        password=extras.getString("password");
 
     }
 
+    public void onBackPressed(){
+        if(isTurn){
+            new AlertDialog.Builder(this).setIcon(android.R.drawable.ic_dialog_alert).setTitle("Exit Game")
+                    .setMessage("Are you sure?")
+                    .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            //isExit=true;
+
+                            pubnub.publish(password, "exit_game,"+FirstPlayerGame.yourChanceNo, new Callback() {
+                            });
+                            Context context=getApplicationContext();
+                            Intent mStartActivity = new Intent(context, MainActivity.class);
+                            int mPendingIntentId = 123456;
+                            PendingIntent mPendingIntent = PendingIntent.getActivity(context, mPendingIntentId,    mStartActivity, PendingIntent.FLAG_CANCEL_CURRENT);
+                            AlarmManager mgr = (AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
+                            mgr.set(AlarmManager.RTC, System.currentTimeMillis()+5, mPendingIntent);
+                            android.os.Process.killProcess(android.os.Process.myPid());
+                        }
+                    }).setNegativeButton("No", null).show();
+        }
+        else{
+            View layout=findViewById(R.id.container);
+            Snackbar.make(layout, "Wait For Turn To Exit", Snackbar.LENGTH_LONG)
+                    .setAction("CLOSE", new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+
+                        }
+                    }).show();
+        }
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

@@ -1,6 +1,8 @@
 package com.example.divye.atlas;
 
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -18,7 +20,7 @@ public class WaitPlayers extends AppCompatActivity {
     Pubnub pubnub;
     TextView textView;
     static Integer key = 1;
-    String messages;
+    String messages,password,username;
     static ArrayList<String> a = new ArrayList<>();
 
     @Override
@@ -27,9 +29,9 @@ public class WaitPlayers extends AppCompatActivity {
         setContentView(R.layout.activity_wait_players);
 
         Bundle extras = getIntent().getExtras();
-        final String password = extras.getString("password");
+        password = extras.getString("password");
         textView = (TextView)findViewById(R.id.textView);
-        final String username = extras.getString("username");
+        username = extras.getString("username");
         Integer priority=0;
         a.add(priority,username);
         pubnub = new Pubnub("pub-c-4aeb3dae-c48d-4f23-b3b2-e54d08bd88ce", "sub-c-fe640624-e5fa-11e5-aad5-02ee2ddab7fe");
@@ -121,5 +123,25 @@ public class WaitPlayers extends AppCompatActivity {
                     //System.out.println(a1[0].toString());
             }
         });
+    }
+    @Override
+    public void onBackPressed() {
+        new AlertDialog.Builder(this).setIcon(android.R.drawable.ic_dialog_alert).setTitle("Cancel Game")
+                .setMessage("Are you sure?")
+                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                        pubnub.publish(password, "exit_wait", new Callback() {
+                        });
+                        Intent launchNextActivity;
+                        launchNextActivity = new Intent(getApplicationContext(), MainActivity.class);
+                        launchNextActivity.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        launchNextActivity.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                        launchNextActivity.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+
+                        startActivity(launchNextActivity);
+                    }
+                }).setNegativeButton("No", null).show();
     }
 }
